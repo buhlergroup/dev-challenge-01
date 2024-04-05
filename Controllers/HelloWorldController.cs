@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Geolocation;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -27,14 +28,33 @@ public class HelloWorldController : ControllerBase
 
     // GET: /search/
     [HttpGet("facilities/search")]
-    public IActionResult search(string item)
+    public IActionResult search(string item, double latitude, double longitude)
     {
+        Coordinate origin = new Coordinate(latitude, longitude);
+        CoordinateBoundaries boundaries = new CoordinateBoundaries(origin, 25);
+
+        double minLatitude = boundaries.MinLatitude;
+        double maxLatitude = boundaries.MaxLatitude;
+        double minLongitude = boundaries.MinLongitude;
+        double maxLongitude = boundaries.MaxLongitude;
+
         string normalized = item.Trim();
 
         var results = mobileFoodFacilities
+            .Where(x => x.Latitude >= minLatitude && x.Latitude <= maxLatitude)
+            .Where(x => x.Longitude >= minLongitude && x.Longitude <= maxLongitude)
             .Where(x => x.FoodItems.Contains(normalized, StringComparison.OrdinalIgnoreCase))
-            .Where(x => !x.FoodItems.Contains($"except for {normalized}", StringComparison.OrdinalIgnoreCase));
-     
+            .Where(x => !x.FoodItems.Contains($"except for {normalized}", StringComparison.OrdinalIgnoreCase))     
+            .Select(result => new 
+            {
+                Name = result.Applicant,
+                Foods = result.FoodItems,
+                Distance = GeoCalculator.GetDistance(origin.Latitude, origin.Longitude, result.Latitude, result.Longitude, 1),
+                Direction = GeoCalculator.GetDirection(origin.Latitude, origin.Longitude, result.Latitude, result.Longitude)
+            })
+            .Where(x => x.Distance <= 1)
+            .OrderBy(x => x.Distance);
+        
         return new JsonResult(results, new JsonSerializerOptions { PropertyNamingPolicy = null });
     }
 }
