@@ -6,35 +6,36 @@ using Microsoft.AspNetCore.Mvc;
 public class HelloWorldController : ControllerBase
 {
     private readonly ICSVService _csvService;
+    private string path;
+    private IEnumerable<MobileFoodFacility> mobileFoodFacilities;
 
     public HelloWorldController(ICSVService csvService)
     {
         _csvService = csvService;
-    }
 
-    // 
-    // GET: /
-    [HttpGet("index")]
-    public string Index()
-    {
-        return "This is my default action...";
-    }
-    // 
-    // GET: /Welcome/
-    [HttpGet("welcome")]
-    public string Welcome()
-    {
-        return "This is the Welcome action method...";
+        path = Environment.CurrentDirectory;
+
+        mobileFoodFacilities = _csvService.ReadCSV<MobileFoodFacility>(path + "/Resources/Mobile_Food_Facility_Permit.csv");
     }
 
     // GET: /cvs/
-    [HttpGet("csv")]
-    public IActionResult csv()
+    [HttpGet("facilities")]
+    public IActionResult index()
     {
-        string path = Environment.CurrentDirectory;
-        var mobileFoodFacilities = _csvService.ReadCSV<MobileFoodFacility>(path + "/Resources/Mobile_Food_Facility_Permit.csv");
-
         return new JsonResult(mobileFoodFacilities, new JsonSerializerOptions { PropertyNamingPolicy = null });
+    }
+
+    // GET: /search/
+    [HttpGet("facilities/search")]
+    public IActionResult search(string item)
+    {
+        string normalized = item.Trim();
+
+        var results = mobileFoodFacilities
+            .Where(x => x.FoodItems.Contains(normalized, StringComparison.OrdinalIgnoreCase))
+            .Where(x => !x.FoodItems.Contains($"except for {normalized}", StringComparison.OrdinalIgnoreCase));
+     
+        return new JsonResult(results, new JsonSerializerOptions { PropertyNamingPolicy = null });
     }
 }
 
