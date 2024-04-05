@@ -1,12 +1,17 @@
-using System.Globalization;
 using System.Text.Json;
-using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/")]
 public class HelloWorldController : ControllerBase
 {
+    private readonly ICSVService _csvService;
+
+    public HelloWorldController(ICSVService csvService)
+    {
+        _csvService = csvService;
+    }
+
     // 
     // GET: /
     [HttpGet("index")]
@@ -27,10 +32,9 @@ public class HelloWorldController : ControllerBase
     public IActionResult csv()
     {
         string path = Environment.CurrentDirectory;
-        var reader = new StreamReader(path + "/Resources/Mobile_Food_Facility_Permit.csv");
-        var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+        var mobileFoodFacilities = _csvService.ReadCSV<MobileFoodFacility>(path + "/Resources/Mobile_Food_Facility_Permit.csv");
 
-        return new JsonResult(csv.GetRecords<MobileFoodFacility>(), new JsonSerializerOptions { PropertyNamingPolicy = null });
+        return new JsonResult(mobileFoodFacilities, new JsonSerializerOptions { PropertyNamingPolicy = null });
     }
 }
 
