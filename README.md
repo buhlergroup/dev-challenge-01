@@ -32,11 +32,17 @@ Follow instructions shown by VSCode to run the project in (dev) container.
 
 ![run](/images/run.png)
 
-You start the project by clicking the play button (on the left) as shown in the image blow.
+Then run the command below in a PowerShell session to install Geolocation library.
+
+```ps
+dotnet add package Geolocation --version 1.2.1
+```
+
+Now you start the project by clicking the play button (on the left) as shown in the image blow.
 
 ![start](/images/start.png)
 
-If you recevie an error regarging not-trusted certificates, you can run commands below.
+:warning: If you recevie an error regarging not-trusted certificates, you can run commands below. 
 
 ```console
 dotnet dev-certs https --clean
@@ -99,3 +105,5 @@ curl --location 'https://localhost:7230/api/facilities/search?latitude=37.760086
 - [Format response data in ASP.NET Core Web API](https://learn.microsoft.com/en-us/aspnet/core/web-api/advanced/formatting?view=aspnetcore-8.0)
 - [Geolocation](https://github.com/scottschluer/geolocation)
 - [Unable to configure HTTPS endpoint](https://stackoverflow.com/questions/53300480/unable-to-configure-https-endpoint-no-server-certificate-was-specified-and-the)
+- [Validating Enums in .Net WebAPI](https://fluentsynergy.com/2022/05/validating-enums-in-net-webapi/)
+- [Coordinates](https://developers.google.com/maps/documentation/javascript/reference/coordinates)
