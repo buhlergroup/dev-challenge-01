@@ -13,7 +13,10 @@
 			"extensions": [
 				"ms-dotnettools.csharp",
 				"ms-vscode.azurecli",
-				"hediet.vscode-drawio"
+				"hediet.vscode-drawio",
+                "mechatroner.rainbow-csv",
+                "ms-dotnettools.csdevkit",
+                "shd101wyy.markdown-preview-enhanced"
 			]
 		}
 	}
